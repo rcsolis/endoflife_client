@@ -18,6 +18,11 @@ This repository contains the componets highlighting in orange.
 
 The logging ilustrates the use of standard log output using the *log standard package*.
 
+### Endpoints
+
+- **/api/** Get all available technologies
+- **/api/versions/:name** Get all versions of one technology
+- **/api/:name/version/:version** Get details of specific version of one technology
 ### Database
 
 Use mongodb as database to test persistend data of cycle details.
