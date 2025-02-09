@@ -1,7 +1,9 @@
-BINARY_FILENAME=main
-BINARY_NAME=client
-
+include .env
+export $(shell sed 's/=.*//' .env)
 dev:
+	@echo "--> Variables"
+	@echo $(BINARY_FILENAME)
+	@echo $(BINARY_NAME)
 	@echo "-->Run dev mode"
 	go run ./cmd/$(BINARY_FILENAME).go
 
@@ -29,5 +31,8 @@ build: dep
 	go build -o bin/${BINARY_NAME} -v ./cmd/$(BINARY_FILENAME).go
 
 run: build
+	@echo "--> Variables"
+	@echo $(BINARY_FILENAME)
+	@echo $(BINARY_NAME)
 	@echo "==>Run binary"
 	./bin/$(BINARY_NAME)

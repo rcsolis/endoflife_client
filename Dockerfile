@@ -1,3 +1,6 @@
+ARG BINARY_NAME="main"
+ARG PORT="3000"
+# Builder image
 FROM golang:1.23.4-bookworm as builder
 # Update and install make
 RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -20,8 +23,11 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
     rm -rf /var/lib/apt/lists/*
 # Copy Environment file
 COPY --from=builder /app/.env .
+# Export environment variables from .env file
+RUN set -o allexport; source .env; set +o allexport
 # Copy the binary from the builder image
 COPY --from=builder /app/bin/ .
 # Run the binary
-RUN chmod +x main
-CMD ["/app/main"]
+ENV BINARY_NAME=${BINARY_NAME}
+ENV PORT=${PORT}
+CMD ./app/${BINARY_NAME}

@@ -23,6 +23,8 @@ The logging ilustrates the use of standard log output using the *log standard pa
 - **/api/** Get all available technologies
 - **/api/versions/:name** Get all versions of one technology
 - **/api/:name/version/:version** Get details of specific version of one technology
+
+
 ### Database
 
 Use mongodb as database to test persistend data of cycle details.
@@ -46,3 +48,6 @@ protoc --proto_path=./ \
 - google.golang.org/grpc/codes
 - google.golang.org/grpc/status
 - Gin
+
+TODO: Save detail in data base
+TODO: Multiple conections in server and accepts multiple values for concurrency in client
