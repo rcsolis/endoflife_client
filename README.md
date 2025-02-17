@@ -49,5 +49,4 @@ protoc --proto_path=./ \
 - google.golang.org/grpc/status
 - Gin
 
-TODO: Save detail in data base
 TODO: Multiple conections in server and accepts multiple values for concurrency in client

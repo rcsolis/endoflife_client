@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"time"
 
 	e "github.com/rcsolis/endoflife_client/internal/error"
@@ -15,18 +16,33 @@ import (
 )
 
 const (
-	address = "localhost:50051"
-	TIMEOUT = (1 * time.Second)
+	PORT       = 50051
+	LOCAL_ADDR = "localhost"
+	TIMEOUT    = (1 * time.Second)
 )
 
 var opts []grpc.DialOption
 
+/**
+ * Initializes the gRPC options
+ */
 func init() {
 	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 }
 
+/**
+ * Creates a connection to the remote gRPC server
+ */
 func connect() (*grpc.ClientConn, error) {
-	return grpc.NewClient(address, opts...)
+	log.Printf("Connecting to the server")
+	val, ok := os.LookupEnv("SERVER_ADDR")
+	if !ok {
+		address := fmt.Sprintf("%s:%d", LOCAL_ADDR, PORT)
+		log.Printf("Address: %s", address)
+		return grpc.NewClient(address, opts...)
+	}
+	log.Printf("Address: %s", val)
+	return grpc.NewClient(val, opts...)
 }
 
 /**

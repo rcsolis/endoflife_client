@@ -1,7 +1,7 @@
-ARG BINARY_NAME="main"
+ARG BINARY_NAME="client"
 ARG PORT="3000"
 # Builder image
-FROM golang:1.23.4-bookworm as builder
+FROM golang:1.23.4-bookworm AS builder
 # Update and install make
 RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     make && \
@@ -14,7 +14,8 @@ COPY . .
 RUN make build
 
 # Release image
-FROM debian:bookworm-slim as release
+FROM debian:bookworm-slim AS release
+
 # Set working directory
 WORKDIR /app
 # Update and install ca-certificates
@@ -25,9 +26,17 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
 COPY --from=builder /app/.env .
 # Export environment variables from .env file
 RUN set -o allexport; source .env; set +o allexport
+RUN export $(grep -v '^#' .env | xargs -d '\n')
 # Copy the binary from the builder image
 COPY --from=builder /app/bin/ .
 # Run the binary
+ARG BINARY_NAME
+ARG PORT
 ENV BINARY_NAME=${BINARY_NAME}
 ENV PORT=${PORT}
-CMD ./app/${BINARY_NAME}
+RUN if [ -z "$BINARY_NAME" ]; then echo "BINARY_NAME must not be empty"; exit 1; fi
+RUN if [ -z "$PORT" ]; then echo "PORT must not be empty"; exit 1; fi
+# Set the binary as executable
+RUN chmod +x /app/$BINARY_NAME
+# Set container entrypoint to the environment variable
+ENTRYPOINT /app/$BINARY_NAME
