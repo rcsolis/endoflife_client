@@ -34,9 +34,8 @@ ARG BINARY_NAME
 ARG PORT
 ENV BINARY_NAME=${BINARY_NAME}
 ENV PORT=${PORT}
-RUN if [ -z "$BINARY_NAME" ]; then echo "BINARY_NAME must not be empty"; exit 1; fi
-RUN if [ -z "$PORT" ]; then echo "PORT must not be empty"; exit 1; fi
 # Set the binary as executable
 RUN chmod +x /app/$BINARY_NAME
+EXPOSE $PORT
 # Set container entrypoint to the environment variable
 ENTRYPOINT /app/$BINARY_NAME

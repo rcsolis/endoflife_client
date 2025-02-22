@@ -16,10 +16,6 @@ const (
 	CollectionName = "technologies"
 )
 
-var (
-	uri string
-)
-
 type LanguageCycleDb struct {
 	Id              bson.ObjectID `json:"id" bson:"_id"`
 	Name            string        `json:"name" bson:"name"`
@@ -35,23 +31,12 @@ type LanguageCycleDb struct {
 	ExtendedSupport string        `json:"extendedSupport" bson:"extendedSupport"`
 }
 
-/**
-* init is a function to initialize the database connection
- */
-func init() {
-	uri, ok := os.LookupEnv("MONGODB_URI")
-	if !ok {
-		log.Fatal("MONGODB_URI is not set")
-	}
-	log.Println("MongoDB connection URI:", uri)
-}
-
 func connect() (*mongo.Client, error) {
-	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	clientOptions := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
+	clientOptions := options.Client().ApplyURI("mongodb://root:example@mongo:27017/")
 	client, err := mongo.Connect(clientOptions)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error connecting to the database:", err)
+		return nil, err
 	}
 	return client, err
 }
@@ -67,12 +52,16 @@ func GetDetails(name, version string) (LanguageCycleDb, bool) {
 	var result bson.M
 	var technologyDetails LanguageCycleDb
 
-	log.Println("Getting details from the database")
 	client, err := connect()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer client.Disconnect(context.Background())
+	defer func(ctx context.Context) {
+		if err = client.Disconnect(ctx); err != nil {
+			log.Fatal(err)
+		}
+	}(context.Background())
+	log.Println("Getting details from the database")
 	// Send a ping to confirm a successful connection
 	if err := client.Database(os.Getenv("MONGODB_DBNAME")).RunCommand(context.Background(), bson.D{{"ping", 1}}).Decode(&result); err != nil {
 		log.Fatal(err)
